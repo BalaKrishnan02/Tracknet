@@ -37,12 +37,12 @@ export default function Sidebar() {
   return (
     <aside className="sidebar">
       <div className="sidebar-header">
-        <div className="logo-badge">
-          <Radio size={20} />
+        <div className="sidebar-logo-wrap">
+          <img src="/logo.png" alt="TrackNet Logo" className="sidebar-logo-img" />
         </div>
         <div className="logo-text">
-          <h1>TraffiTrace AI</h1>
-          <span>SIH 2026 - ID 26127</span>
+          <h1>TrackNet</h1>
+          <span>AI Vehicle Tracking</span>
         </div>
       </div>
 
@@ -64,7 +64,7 @@ export default function Sidebar() {
 
       <div className="sidebar-footer">
         <div style={{ fontSize: "0.72rem", color: "#64748b", textAlign: "center" }}>
-          TraffiTrace Platform v1.2.0<br/>Multi-Camera ANPR Video Pipeline Active
+          TrackNet Platform v1.2.0<br/>AI-Powered Multi-Camera ANPR Grid
         </div>
       </div>
     </aside>

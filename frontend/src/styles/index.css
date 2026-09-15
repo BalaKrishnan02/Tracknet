@@ -87,6 +87,27 @@ body {
   box-shadow: 0 2px 8px rgba(6, 182, 212, 0.35);
 }
 
+.sidebar-logo-wrap {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  border: 1.5px solid rgba(56, 189, 248, 0.35);
+  flex-shrink: 0;
+  padding: 2px;
+}
+
+.sidebar-logo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
 .logo-text h1 {
   font-size: 1.05rem;
   font-weight: 700;

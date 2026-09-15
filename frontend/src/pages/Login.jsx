@@ -50,21 +50,31 @@ export default function Login({ onLoginSuccess }) {
           textAlign: "center"
         }}>
           <div style={{
-            width: "56px",
-            height: "56px",
-            background: "linear-gradient(135deg, #2563eb, #06b6d4)",
-            borderRadius: "14px",
+            width: "80px",
+            height: "80px",
+            background: "#ffffff",
+            borderRadius: "18px",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             margin: "0 auto 16px auto",
-            boxShadow: "0 8px 16px rgba(6, 182, 212, 0.4)"
+            boxShadow: "0 8px 24px rgba(0, 0, 0, 0.35)",
+            padding: "4px",
+            border: "2px solid rgba(56, 189, 248, 0.4)",
+            overflow: "hidden"
           }}>
-            <Radio size={30} color="white" />
+            <img
+              src="/logo.png"
+              alt="TrackNet Logo"
+              style={{ width: "100%", height: "100%", objectFit: "contain", borderRadius: "14px" }}
+            />
           </div>
-          <h1 style={{ fontSize: "1.45rem", fontWeight: 800, letterSpacing: "-0.02em" }}>TraffiTrace AI</h1>
-          <p style={{ fontSize: "0.82rem", color: "#94a3b8", marginTop: "4px" }}>
-            Smart City ANPR Tracking & Traffic Analytics
+          <h1 style={{ fontSize: "1.65rem", fontWeight: 800, letterSpacing: "-0.02em" }}>TrackNet</h1>
+          <p style={{ fontSize: "0.85rem", color: "#38bdf8", marginTop: "4px", fontWeight: 600 }}>
+            TRACK TODAY | TRANSFORM TOMORROW
+          </p>
+          <p style={{ fontSize: "0.78rem", color: "#94a3b8", marginTop: "2px" }}>
+            AI-Powered Vehicle Tracking for Smarter, Safer Cities
           </p>
           <div style={{
             display: "inline-block",
@@ -77,7 +87,7 @@ export default function Login({ onLoginSuccess }) {
             fontWeight: 600,
             marginTop: "10px"
           }}>
-            Smart India Hackathon 2026 • PS 26127
+            Smart India Hackathon 2026 â€¢ PS 26127
           </div>
         </div>
 
@@ -134,7 +144,7 @@ export default function Login({ onLoginSuccess }) {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
+                  placeholder="ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½"
                   style={{
                     width: "100%",
                     padding: "11px 42px 11px 40px",
@@ -200,4 +210,4 @@ export default function Login({ onLoginSuccess }) {
       </div>
     </div>
   );
-}
+}

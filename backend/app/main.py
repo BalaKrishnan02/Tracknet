@@ -61,16 +61,22 @@ async def lifespan(app: FastAPI):
         task.cancel()
 
 app = FastAPI(
-    title="TraffiTrace AI - ANPR Vehicle Tracking & Traffic Analytics",
+    title="TrackNet - AI-Powered Vehicle Tracking & Traffic Analytics",
     description="Full-stack AI platform for Smart India Hackathon 2026 (Problem Statement 26127)",
-    version="1.1.0",
+    version="1.2.0",
     lifespan=lifespan
 )
 
 # CORS Configuration
+cors_origins = list(settings.BACKEND_CORS_ORIGINS)
+for o in ["https://tracknet-seven.vercel.app", "http://localhost:5173", "http://localhost:3000"]:
+    if o not in cors_origins:
+        cors_origins.append(o)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=cors_origins,
+    allow_origin_regex=r"^https:\/\/.*\.vercel\.app$",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

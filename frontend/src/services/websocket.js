@@ -6,12 +6,20 @@ class LiveWebSocketService {
   }
 
   connect() {
-    const wsUrl = "ws://localhost:8000/ws/live-detections";
+    let wsUrl = import.meta.env.VITE_WS_URL;
+    if (!wsUrl) {
+      if (import.meta.env.VITE_API_URL) {
+        const base = import.meta.env.VITE_API_URL.replace(/\/api\/?$/, "");
+        wsUrl = base.replace(/^https:/, "wss:").replace(/^http:/, "ws:") + "/ws/live-detections";
+      } else {
+        wsUrl = "ws://localhost:8000/ws/live-detections";
+      }
+    }
     try {
       this.ws = new WebSocket(wsUrl);
 
       this.ws.onopen = () => {
-        console.log("Connected to TraffiTrace AI Live WebSocket Feed");
+        console.log("Connected to TrackNet Live WebSocket Feed:", wsUrl);
       };
 
       this.ws.onmessage = (event) => {

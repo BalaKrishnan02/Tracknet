@@ -1,0 +1,61 @@
+# Dependencies
+node_modules/
+*/node_modules/
+package-lock.json.bak
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Python
+__pycache__/
+*/__pycache__/
+*/**/__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+env.bak/
+venv.bak/
+.pytest_cache/
+*/.pytest_cache/
+*/**/.pytest_cache/
+.coverage
+htmlcov/
+
+# Environment and Secrets
+.env
+.env*.local
+backend/.env
+frontend/.env
+*.local
+
+# SQLite Database
+*.db
+*.sqlite
+*.sqlite3
+backend/traffitrace.db
+
+# Frontend Build Output
+dist/
+dist-ssr/
+frontend/dist/
+frontend/dist-ssr/
+*.local
+
+# Temporary / Large Uploaded Videos & Test Artifacts
+backend/uploads/videos/1788949*
+backend/uploads/videos/*.tmp
+backend/test_frame.jpg
+
+# OS and Editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo

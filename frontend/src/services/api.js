@@ -1,21 +1,44 @@
 import axios from "axios";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
+export const getApiBaseUrl = () => {
+  const customUrl = localStorage.getItem("tracknet_custom_api_url");
+  if (customUrl && customUrl.trim()) return customUrl.trim();
+  return import.meta.env.VITE_API_URL || "http://localhost:8000/api";
+};
+
+export const setApiBaseUrl = (url) => {
+  if (!url) {
+    localStorage.removeItem("tracknet_custom_api_url");
+  } else {
+    localStorage.setItem("tracknet_custom_api_url", url.trim());
+  }
+  api.defaults.baseURL = getApiBaseUrl();
+};
 
 const api = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: getApiBaseUrl(),
   headers: {
     "Content-Type": "application/json",
   },
 });
 
 api.interceptors.request.use((config) => {
+  config.baseURL = getApiBaseUrl();
   const token = localStorage.getItem("traffitrace_token");
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
 });
+
+export const healthService = {
+  check: async (customBase) => {
+    const base = customBase || getApiBaseUrl();
+    const url = base.replace(/\/api\/?$/, "") + "/api/health";
+    const res = await axios.get(url, { timeout: 6000 });
+    return res.data;
+  }
+};
 
 export const authService = {
   login: async (email, password) => {
@@ -25,6 +48,18 @@ export const authService = {
       localStorage.setItem("traffitrace_user", JSON.stringify(res.data.user));
     }
     return res.data;
+  },
+  demoLogin: (role = "admin") => {
+    const demoUser = {
+      id: 1,
+      email: role === "admin" ? "admin@tracknet.ai" : "officer@tracknet.ai",
+      name: role === "admin" ? "Commander Admin" : "Traffic Officer",
+      role: role === "admin" ? "admin" : "officer",
+      badge_number: "TN-2026-HQ"
+    };
+    localStorage.setItem("traffitrace_token", "demo_jwt_token_tracknet_sih2026");
+    localStorage.setItem("traffitrace_user", JSON.stringify(demoUser));
+    return { access_token: "demo_jwt_token_tracknet_sih2026", user: demoUser };
   },
   logout: () => {
     localStorage.removeItem("traffitrace_token");

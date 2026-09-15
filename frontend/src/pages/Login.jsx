@@ -1,6 +1,6 @@
-import React, { useState } from "react";
-import { Radio, Lock, Mail, Eye, EyeOff, ShieldCheck, ArrowRight } from "lucide-react";
-import { authService } from "../services/api";
+import React, { useState, useEffect } from "react";
+import { Radio, Lock, Mail, Eye, EyeOff, ShieldCheck, ArrowRight, Server, CheckCircle2, AlertCircle, Sparkles, RefreshCw } from "lucide-react";
+import { authService, getApiBaseUrl, setApiBaseUrl, healthService } from "../services/api";
 
 export default function Login({ onLoginSuccess }) {
   const [email, setEmail] = useState("admin@traffitrace.ai");
@@ -8,6 +8,41 @@ export default function Login({ onLoginSuccess }) {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+
+  // Backend host configuration state
+  const [showHostConfig, setShowHostConfig] = useState(false);
+  const [backendUrl, setBackendUrl] = useState(getApiBaseUrl());
+  const [healthStatus, setHealthStatus] = useState(null);
+  const [isCheckingHealth, setIsCheckingHealth] = useState(false);
+
+  useEffect(() => {
+    // Auto check current backend health on mount
+    checkBackendHealth(getApiBaseUrl());
+  }, []);
+
+  const checkBackendHealth = async (url) => {
+    setIsCheckingHealth(true);
+    try {
+      const data = await healthService.check(url);
+      setHealthStatus({ ok: true, data });
+    } catch (err) {
+      setHealthStatus({ ok: false, error: err.message || "Failed to connect" });
+    } finally {
+      setIsCheckingHealth(false);
+    }
+  };
+
+  const handleSaveBackendUrl = () => {
+    setApiBaseUrl(backendUrl);
+    checkBackendHealth(backendUrl);
+    setError("");
+  };
+
+  const handleInstantDemo = (role = "admin") => {
+    authService.demoLogin(role);
+    if (onLoginSuccess) onLoginSuccess();
+    window.location.href = "/";
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -19,7 +54,13 @@ export default function Login({ onLoginSuccess }) {
       if (onLoginSuccess) onLoginSuccess();
       window.location.href = "/";
     } catch (err) {
-      setError(err.response?.data?.detail || "Invalid email or password. Check credentials.");
+      if (!err.response || err.code === "ERR_NETWORK") {
+        setError(
+          `Cannot reach backend server at "${getApiBaseUrl()}". Click 'Configure Backend Host' below to update your backend URL, or use 'Instant Demo Access' to explore.`
+        );
+      } else {
+        setError(err.response?.data?.detail || "Invalid email or password. Check credentials.");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -36,7 +77,7 @@ export default function Login({ onLoginSuccess }) {
     }}>
       <div style={{
         width: "100%",
-        maxWidth: "440px",
+        maxWidth: "460px",
         background: "#ffffff",
         borderRadius: "16px",
         boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.35)",
@@ -45,7 +86,7 @@ export default function Login({ onLoginSuccess }) {
         {/* Header Header Banner */}
         <div style={{
           background: "linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%)",
-          padding: "32px 28px",
+          padding: "28px 24px",
           color: "white",
           textAlign: "center"
         }}>
@@ -57,7 +98,7 @@ export default function Login({ onLoginSuccess }) {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            margin: "0 auto 16px auto",
+            margin: "0 auto 14px auto",
             boxShadow: "0 8px 24px rgba(0, 0, 0, 0.35)",
             padding: "4px",
             border: "2px solid rgba(56, 189, 248, 0.4)",
@@ -92,25 +133,26 @@ export default function Login({ onLoginSuccess }) {
         </div>
 
         {/* Form Body */}
-        <div style={{ padding: "32px 28px" }}>
+        <div style={{ padding: "28px 24px" }}>
           {error && (
             <div style={{
-              background: "#fee2e2",
-              border: "1px solid #fca5a5",
+              background: "#fef2f2",
+              borderLeft: "4px solid #ef4444",
               color: "#991b1b",
-              borderRadius: "8px",
               padding: "10px 14px",
-              fontSize: "0.85rem",
-              marginBottom: "20px"
+              borderRadius: "6px",
+              fontSize: "0.82rem",
+              marginBottom: "16px",
+              lineHeight: 1.4
             }}>
               {error}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "18px" }}>
+          <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
             <div>
               <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 600, color: "#334155", marginBottom: "6px" }}>
-                Official Email Address
+                Official Email
               </label>
               <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
                 <Mail size={18} style={{ position: "absolute", left: "12px", color: "#94a3b8" }} />
@@ -122,10 +164,10 @@ export default function Login({ onLoginSuccess }) {
                   placeholder="admin@traffitrace.ai"
                   style={{
                     width: "100%",
-                    padding: "11px 12px 11px 40px",
+                    padding: "10px 12px 10px 40px",
                     borderRadius: "8px",
                     border: "1px solid #cbd5e1",
-                    fontSize: "0.9rem",
+                    fontSize: "0.88rem",
                     outline: "none",
                     fontFamily: "var(--font-sans)"
                   }}
@@ -144,13 +186,13 @@ export default function Login({ onLoginSuccess }) {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="��������"
+                  placeholder="••••••••"
                   style={{
                     width: "100%",
-                    padding: "11px 42px 11px 40px",
+                    padding: "10px 40px 10px 40px",
                     borderRadius: "8px",
                     border: "1px solid #cbd5e1",
-                    fontSize: "0.9rem",
+                    fontSize: "0.88rem",
                     outline: "none",
                     fontFamily: "var(--font-sans)"
                   }}
@@ -178,30 +220,162 @@ export default function Login({ onLoginSuccess }) {
               className="btn-primary"
               style={{
                 width: "100%",
-                padding: "12px",
+                padding: "11px",
                 justifyContent: "center",
-                fontSize: "0.95rem",
-                marginTop: "6px",
-                boxShadow: "0 4px 12px rgba(37, 99, 235, 0.35)"
+                fontSize: "0.92rem",
+                marginTop: "4px",
+                boxShadow: "0 4px 12px rgba(37, 99, 235, 0.35)",
+                display: "flex",
+                alignItems: "center",
+                gap: "8px"
               }}
             >
               {isLoading ? "Authenticating Grid..." : "Sign In to Command Center"}
-              <ArrowRight size={18} />
+              <ArrowRight size={17} />
+            </button>
+
+            {/* Instant Demo Access Button */}
+            <button
+              type="button"
+              onClick={() => handleInstantDemo("admin")}
+              style={{
+                width: "100%",
+                padding: "10px",
+                borderRadius: "8px",
+                border: "1.5px solid #2563eb",
+                background: "#eff6ff",
+                color: "#1d4ed8",
+                fontWeight: 600,
+                fontSize: "0.88rem",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "6px",
+                transition: "all 0.2s"
+              }}
+            >
+              <Sparkles size={16} color="#2563eb" />
+              Instant Demo Access (Explore Platform)
             </button>
           </form>
 
+          {/* Backend Connection & Host Drawer */}
+          <div style={{
+            marginTop: "18px",
+            border: "1px solid #e2e8f0",
+            borderRadius: "8px",
+            overflow: "hidden"
+          }}>
+            <button
+              type="button"
+              onClick={() => setShowHostConfig(!showHostConfig)}
+              style={{
+                width: "100%",
+                padding: "10px 14px",
+                background: "#f8fafc",
+                border: "none",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                cursor: "pointer",
+                fontSize: "0.78rem",
+                fontWeight: 600,
+                color: "#334155"
+              }}
+            >
+              <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                <Server size={14} color="#64748b" />
+                Backend & Database Link
+              </span>
+              <span style={{
+                fontSize: "0.7rem",
+                padding: "2px 8px",
+                borderRadius: "12px",
+                fontWeight: 700,
+                background: healthStatus?.ok ? "#dcfce7" : "#fee2e2",
+                color: healthStatus?.ok ? "#15803d" : "#b91c1c"
+              }}>
+                {isCheckingHealth ? "Checking..." : healthStatus?.ok ? "Online" : "Disconnected"}
+              </span>
+            </button>
+
+            {showHostConfig && (
+              <div style={{ padding: "14px", background: "#ffffff", borderTop: "1px solid #e2e8f0", fontSize: "0.78rem" }}>
+                <label style={{ display: "block", color: "#475569", fontWeight: 600, marginBottom: "4px" }}>
+                  Backend API URL:
+                </label>
+                <div style={{ display: "flex", gap: "6px", marginBottom: "8px" }}>
+                  <input
+                    type="text"
+                    value={backendUrl}
+                    onChange={(e) => setBackendUrl(e.target.value)}
+                    placeholder="https://tracknet-backend.onrender.com/api"
+                    style={{
+                      flex: 1,
+                      padding: "6px 8px",
+                      borderRadius: "6px",
+                      border: "1px solid #cbd5e1",
+                      fontSize: "0.78rem",
+                      fontFamily: "var(--font-mono)"
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={handleSaveBackendUrl}
+                    style={{
+                      padding: "6px 12px",
+                      background: "#2563eb",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "6px",
+                      fontWeight: 600,
+                      cursor: "pointer"
+                    }}
+                  >
+                    Save
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => checkBackendHealth(backendUrl)}
+                    title="Test Connection"
+                    style={{
+                      padding: "6px 10px",
+                      background: "#f1f5f9",
+                      border: "1px solid #cbd5e1",
+                      borderRadius: "6px",
+                      cursor: "pointer"
+                    }}
+                  >
+                    <RefreshCw size={12} />
+                  </button>
+                </div>
+
+                {healthStatus?.ok ? (
+                  <div style={{ color: "#166534", background: "#f0fdf4", padding: "6px 10px", borderRadius: "4px", fontSize: "0.72rem" }}>
+                    ✓ Connected: {healthStatus.data?.app} v{healthStatus.data?.version} (Database: {healthStatus.data?.database} / {healthStatus.data?.database_type})
+                  </div>
+                ) : (
+                  <div style={{ color: "#991b1b", background: "#fef2f2", padding: "6px 10px", borderRadius: "4px", fontSize: "0.72rem" }}>
+                    ✗ Backend host unreachable at current URL. Set your cloud backend URL (e.g. Render/Railway) above.
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
           {/* Demo Quick-fill Helper */}
           <div style={{
-            marginTop: "24px",
-            padding: "12px",
+            marginTop: "16px",
+            padding: "10px 12px",
             background: "#f8fafc",
             borderRadius: "8px",
             border: "1px solid #e2e8f0",
-            fontSize: "0.78rem",
+            fontSize: "0.76rem",
             color: "#475569"
           }}>
-            <div style={{ fontWeight: 700, color: "#0f172a", marginBottom: "4px", display: "flex", alignItems: "center", gap: "5px" }}>
-              <ShieldCheck size={14} color="#2563eb" /> SIH Demo Credentials:
+            <div style={{ fontWeight: 700, color: "#0f172a", marginBottom: "3px", display: "flex", alignItems: "center", gap: "5px" }}>
+              <ShieldCheck size={13} color="#2563eb" /> Pre-Configured Credentials:
             </div>
             <div>Admin: <code>admin@traffitrace.ai</code> / <code>Admin@123</code></div>
             <div>Officer: <code>officer@traffitrace.ai</code> / <code>Officer@123</code></div>
@@ -210,4 +384,4 @@ export default function Login({ onLoginSuccess }) {
       </div>
     </div>
   );
-}
+}

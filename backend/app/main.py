@@ -1,13 +1,16 @@
 import asyncio
 import logging
+from datetime import datetime
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 import os
+from sqlalchemy.orm import Session
+from sqlalchemy import text
 
 from app.config import settings
-from app.database import engine, Base, SessionLocal
+from app.database import engine, Base, SessionLocal, get_db
 from app.services.demo_data_generator import seed_demo_database
 from app.services.india_demo_generator import seed_india_network
 from app.services.live_feed_simulator import start_live_feed_simulation
@@ -128,11 +131,32 @@ async def websocket_live_detections(websocket: WebSocket):
 @app.get("/")
 def root():
     return {
-        "project": "TraffiTrace AI",
+        "project": "TrackNet AI",
+        "tagline": "Track Today | Transform Tomorrow",
         "hackathon": "Smart India Hackathon 2026",
         "problem_statement_id": "26127",
-        "module": "India-Wide Active ANPR Camera Network & Placement Analysis",
+        "module": "AI-Powered Vehicle Tracking & City Traffic Analytics",
         "status": "Operational",
         "demo_mode": settings.DEMO_MODE,
         "docs_url": "/docs"
     }
+
+@app.get("/health")
+@app.get("/api/health")
+def health_check(db: Session = Depends(get_db)):
+    try:
+        db.execute(text("SELECT 1"))
+        db_status = "connected"
+    except Exception as e:
+        db_status = f"unhealthy: {str(e)}"
+    
+    return {
+        "status": "online",
+        "app": "TrackNet AI ANPR Platform",
+        "version": "1.2.0",
+        "database": db_status,
+        "database_type": "postgresql" if str(settings.DATABASE_URL).startswith("postgres") else "sqlite",
+        "cors_origins": list(settings.BACKEND_CORS_ORIGINS),
+        "server_time": datetime.utcnow().isoformat()
+    }
+

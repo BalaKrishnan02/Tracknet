@@ -48,7 +48,7 @@ frontend/dist-ssr/
 *.local
 
 # Temporary / Large Uploaded Videos & Test Artifacts
-backend/uploads/videos/1788949*
+backend/uploads/videos/178*
 backend/uploads/videos/*.tmp
 backend/test_frame.jpg
 

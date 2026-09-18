@@ -113,4 +113,4 @@ def get_route_analytics(db: Session = Depends(get_db)):
 @router.get("/origin-destination")
 def get_od_analytics(db: Session = Depends(get_db)):
     res = get_traffic_analytics(db)
-    return res.od_matrix
+    return res["od_matrix"]

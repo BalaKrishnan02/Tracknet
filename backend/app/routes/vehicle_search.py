@@ -97,6 +97,7 @@ def search_all_camera_videos(req: VehicleSearchRequest, db: Session = Depends(ge
             # 5 seconds pre-roll for automatic video jump
             jump_sec = max(0.0, v_sec - 5.0)
 
+            # Safely resolve timestamp — absolute_timestamp may be None on old seed records
             abs_dt = d.absolute_timestamp or d.timestamp or datetime.utcnow()
 
             matched_results.append({
@@ -135,7 +136,8 @@ def search_all_camera_videos(req: VehicleSearchRequest, db: Session = Depends(ge
             })
 
     # Sort strictly chronologically by absolute_timestamp ASC
-    matched_results.sort(key=lambda x: x["absolute_timestamp"])
+    # Use a safe sort key — convert to isoformat string-comparable value if it's a datetime
+    matched_results.sort(key=lambda x: x["absolute_timestamp"] if isinstance(x["absolute_timestamp"], str) else (x["absolute_timestamp"].isoformat() if x["absolute_timestamp"] else ""))
 
     # Unique cameras found
     unique_cams = list(set(m["camera_code"] for m in matched_results))

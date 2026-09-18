@@ -1,3 +1,5 @@
+import { getApiBaseUrl } from "./api";
+
 class LiveWebSocketService {
   constructor() {
     this.ws = null;
@@ -8,12 +10,8 @@ class LiveWebSocketService {
   connect() {
     let wsUrl = import.meta.env.VITE_WS_URL;
     if (!wsUrl) {
-      if (import.meta.env.VITE_API_URL) {
-        const base = import.meta.env.VITE_API_URL.replace(/\/api\/?$/, "");
-        wsUrl = base.replace(/^https:/, "wss:").replace(/^http:/, "ws:") + "/ws/live-detections";
-      } else {
-        wsUrl = "ws://localhost:8000/ws/live-detections";
-      }
+      const base = getApiBaseUrl().replace(/\/api\/?$/, "");
+      wsUrl = base.replace(/^https:/, "wss:").replace(/^http:/, "ws:") + "/ws/live-detections";
     }
     try {
       this.ws = new WebSocket(wsUrl);

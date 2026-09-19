@@ -1,8 +1,10 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Lock, Mail, Eye, EyeOff, ArrowRight, ShieldCheck, CheckCircle2, Sliders } from "lucide-react";
 import { authService, getApiBaseUrl, setApiBaseUrl } from "../services/api";
 
 export default function Login({ onLoginSuccess }) {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("admin@traffitrace.ai");
   const [password, setPassword] = useState("Admin@123");
   const [showPassword, setShowPassword] = useState(false);
@@ -23,13 +25,13 @@ export default function Login({ onLoginSuccess }) {
       await new Promise((r) => setTimeout(r, 400));
       await authService.login(email, password);
       if (onLoginSuccess) onLoginSuccess();
-      window.location.href = "/";
+      navigate("/", { replace: true });
     } catch (err) {
       console.warn("Auth fallback activated:", err);
       // Guarantee sign-in for any credentials
       authService.demoLogin(email.toLowerCase().includes("officer") ? "officer" : "admin");
       if (onLoginSuccess) onLoginSuccess();
-      window.location.href = "/";
+      navigate("/", { replace: true });
     } finally {
       setIsLoading(false);
     }

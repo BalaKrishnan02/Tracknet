@@ -1,15 +1,28 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Bell, ShieldCheck, Activity, User, LogOut } from "lucide-react";
 import { authService } from "../services/api";
 
 export default function Navbar({ title, unreadAlerts = 0, onLogout }) {
+  const navigate = useNavigate();
   const [currentTime, setCurrentTime] = useState(new Date());
-  const user = authService.getCurrentUser() || { name: "Officer", role: "Traffic Officer" };
+  const user = authService.getCurrentUser() || { name: "Commander Admin", role: "admin" };
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
+
+  const handleLogout = () => {
+    try {
+      authService.logout();
+      if (onLogout) onLogout();
+    } catch (err) {
+      console.warn("Logout error:", err);
+    } finally {
+      navigate("/login", { replace: true });
+    }
+  };
 
   return (
     <header className="top-navbar">
@@ -28,7 +41,7 @@ export default function Navbar({ title, unreadAlerts = 0, onLogout }) {
         </div>
 
         <div style={{ position: "relative" }}>
-          <button className="btn-icon" title="Alerts" onClick={() => window.location.href = "/alerts"}>
+          <button className="btn-icon" title="Alerts" onClick={() => navigate("/alerts")}>
             <Bell size={18} />
             {unreadAlerts > 0 && (
               <span style={{
@@ -53,10 +66,10 @@ export default function Navbar({ title, unreadAlerts = 0, onLogout }) {
         </div>
 
         <div className="user-badge" style={{ paddingLeft: "8px", borderLeft: "1px solid var(--border-subtle)" }}>
-          <div className="user-avatar">{user.name.charAt(0)}</div>
+          <div className="user-avatar">{user.name?.charAt(0) || "A"}</div>
           <div className="user-details">
-            <div className="name">{user.name}</div>
-            <div className="role">{user.role}</div>
+            <div className="name">{user.name || "Administrator"}</div>
+            <div className="role">{user.role || "admin"}</div>
           </div>
         </div>
 
@@ -64,11 +77,7 @@ export default function Navbar({ title, unreadAlerts = 0, onLogout }) {
           className="btn-icon"
           title="Logout"
           style={{ color: "#ef4444" }}
-          onClick={() => {
-            authService.logout();
-            if (onLogout) onLogout();
-            window.location.href = "/login";
-          }}
+          onClick={handleLogout}
         >
           <LogOut size={17} />
         </button>

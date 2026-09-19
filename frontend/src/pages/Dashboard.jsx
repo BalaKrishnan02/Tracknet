@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Car,
   Video,
@@ -21,6 +21,7 @@ import { dashboardService, cameraService } from "../services/api";
 import { liveWs } from "../services/websocket";
 
 export default function Dashboard() {
+  const navigate = useNavigate();
   const [summary, setSummary] = useState(null);
   const [cameras, setCameras] = useState([]);
   const [liveTicker, setLiveTicker] = useState([]);
@@ -92,7 +93,7 @@ export default function Dashboard() {
         />
         
         {/* REPLACED: Active ANPR Cameras with Enriched Metrics */}
-        <div className="stat-card" style={{ cursor: "pointer" }} onClick={() => window.location.href = "/active-cameras"}>
+        <div className="stat-card" style={{ cursor: "pointer" }} onClick={() => navigate("/active-cameras")}>
           <div className="stat-icon" style={{ color: "#10b981", backgroundColor: "#10b98115" }}>
             <Video size={22} />
           </div>
@@ -100,7 +101,7 @@ export default function Dashboard() {
             <div className="stat-value">{activeAnpr} / {totalReg}</div>
             <div className="stat-label">Active ANPR Cameras</div>
             <div style={{ fontSize: "0.72rem", color: "#10b981", fontWeight: 600, marginTop: "2px" }}>
-              {statesCov} States • {citiesCov} Cities Covered
+              {statesCov} States â€¢ {citiesCov} Cities Covered
             </div>
             <div style={{ fontSize: "0.68rem", color: "#64748b", marginTop: "1px" }}>
               Offline: {offlineCams} | Proposed: {propCams}
@@ -233,7 +234,7 @@ export default function Dashboard() {
                     )}
                   </div>
                   <div style={{ fontSize: "0.75rem", color: "#64748b", marginTop: "4px" }}>
-                    {det.camera_code} • {det.camera_location || det.camera_name}
+                    {det.camera_code} â€¢ {det.camera_location || det.camera_name}
                   </div>
                 </div>
 
